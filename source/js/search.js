@@ -36,6 +36,15 @@ const timeElement = otherInfoContainerElement.querySelector('.card__time');
 
 //
 
+const getLocation = () => {
+  const getCoords = (geolocation) => {
+    const lat = geolocation.coords.latitude;
+    const lon = geolocation.coords.longitude;
+    makeRequestsByCoords(lat, lon);
+  };
+  navigator.geolocation.getCurrentPosition(getCoords, () => { makeRequestsByCity(); });
+};
+
 const calculateLocalTime = (timezone) => {
   const date = new Date();
   const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
@@ -77,16 +86,27 @@ const updateBackground = (images) => {
   document.body.style.background = `url(${images.results[0].urls.regular})`;
 };
 
-const initSearchForm = async () => {
-  searchFormElement.addEventListener('submit', searchFormSubmitHandler);
-};
-
-async function searchFormSubmitHandler(evt) {
+async function makeRequestsByCoords (lat, lon) {
   try {
-    evt.preventDefault();
-    const translatedSearchQuery = await myMemory.getTranslation(searchFormInputElement.value);
+    const data = await weather.searchByCoord(lat, lon);
+    console.log(data);
+    if (!data) {
+      console.log('Ошибка при загрузке информации о погоде');
+    } else { updateWeather(data); }
+
+    const images = await unsplash.getImage(data.name);
+    if (!images) {
+      console.log('Ошибка при загрузке фотографии');
+    } else { updateBackground(images); }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery = 'Moscow') {
+  try {
     const [data, images] = await Promise.allSettled([
-      weather.searchByCity(searchFormInputElement.value),
+      weather.searchByCity(searchquery),
       unsplash.getImage(translatedSearchQuery),
     ]);
     if (!images.value) {
@@ -98,24 +118,26 @@ async function searchFormSubmitHandler(evt) {
   } catch (error) {
     console.log(error);
   }
+}
+
+const initSearchForm = async () => {
+  searchFormElement.addEventListener('submit', searchFormSubmitHandler);
+};
+
+async function searchFormSubmitHandler(evt) {
+  evt.preventDefault();
+  try {
+    const translatedSearchQuery = await myMemory.getTranslation(searchFormInputElement.value);
+    makeRequestsByCity(searchFormInputElement.value, translatedSearchQuery);
+  } catch (error) {
+    console.error(error);
+  }
   searchFormInputElement.value = '';
 }
 
 async function windowLoadHandler() {
-  try {
-    const [data, images] = await Promise.allSettled([
-      weather.searchByCity('Moscow'),
-      unsplash.getImage('Moscow'),
-    ]);
-    if (!images.value) {
-      console.log('Ошибка при загрузке фотографии');
-    } else { updateBackground(images.value); }
-    if (!data.value) {
-      console.log('Ошибка при загрузке информации о погоде');
-    } else { updateWeather(data.value); }
-  } catch (error) {
-    console.log(error);
-  }
+  getLocation();
+  // makeRequestsByCity();
 }
 
 export {
