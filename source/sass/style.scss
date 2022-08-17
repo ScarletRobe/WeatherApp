@@ -5,9 +5,14 @@
 
 body {
   font-size: 20px;
+  // padding: 1em;
 
-  background: url(https://source.unsplash.com/1600x900/?moscow);
+  overflow: hidden;
+  background: url('../images/background_moscow.jpg');
   background-color: gray;
+  background-position: 50% 50% !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
 }
 
 .container {
@@ -102,15 +107,25 @@ body {
 }
 
 .card__city {
-  margin-bottom: 0.5em;
+  margin-bottom: .5em;
 
-  font-size: 32px;
+  font-size: 40px;
 }
 
 .card__temperature {
-  margin-bottom: 1em;
+  margin-bottom: .5em;
 
-  font-size: 30px;
+  font-size: 40px;
+}
+
+.card__icon {
+  width: 60px;
+  font-size: 40px;
+  margin-bottom: .5em;
+}
+
+.card__description {
+  text-transform: capitalize;
 }
 
 .card__more-info {
