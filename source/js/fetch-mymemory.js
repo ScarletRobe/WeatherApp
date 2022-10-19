@@ -5,7 +5,7 @@ export default class MyMemory {
   }
 
   destroyPunctuationMarks (text) {
-    return text.replace(/[!?,.]/g, '');
+    return text.replaceAll(/[!?,.]/g, '');
   }
 
   async getTranslation(text) {

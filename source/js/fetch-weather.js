@@ -9,7 +9,7 @@ export default class Weather {
   }
 
   destroySpaces (text) {
-    return text.replace(/\s/g, '-');
+    return text.replaceAll(/\s/g, '-');
   }
 
   async searchByCity (city) {
@@ -17,8 +17,8 @@ export default class Weather {
     if (data) {
       return data;
     }
-    city = this.destroySpaces(city);
 
+    city = this.destroySpaces(city);
     data = await this.fetchWeather(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${this.API_KEY}&units=metric&lang=${this.lang}`);
     if (data) {
       return data;
