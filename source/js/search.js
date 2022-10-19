@@ -42,7 +42,9 @@ const getLocation = () => {
     const lon = geolocation.coords.longitude;
     makeRequestsByCoords(lat, lon);
   };
-  navigator.geolocation.getCurrentPosition(getCoords, () => { makeRequestsByCity(); });
+  navigator.geolocation.getCurrentPosition(getCoords, () => {
+    makeRequestsByCity();
+  });
 };
 
 const calculateLocalTime = (timezone) => {
@@ -81,25 +83,30 @@ const updateWeather = (data) => {
   // sunsetElement.textContent = `Sunset: ${new Date((data.sys.sunset + data.timezone * 60) * 1000).toLocaleTimeString()}`;
 };
 
-const updateBackground = (images) => {
+const updateBackground = (images, searchQuery) => {
+  if (images) {
+    document.body.style.background = `url(${images.results[0].urls.regular})`;
+  } else {
+    document.body.style.background = `url(https://source.unsplash.com/1600x900/?${searchQuery})`;
+  }
   // document.body.style.background = `url(${images.results[0].urls.raw}&w=${availableScreenWidth}&dpr=2&crop=faces,entropy)`;
-  document.body.style.background = `url(${images.results[0].urls.regular})`;
 };
 
 async function makeRequestsByCoords (lat, lon) {
   try {
     const data = await weather.searchByCoord(lat, lon);
-    console.log(data);
+
     if (!data) {
-      console.log('Ошибка при загрузке информации о погоде');
-    } else { updateWeather(data); }
+      throw new Error('Ошибка при загрузке информации о погоде');
+    } else {
+      updateWeather(data);
+    }
 
     const images = await unsplash.getImage(data.name);
-    if (!images) {
-      console.log('Ошибка при загрузке фотографии');
-    } else { updateBackground(images); }
+    updateBackground(images, data.name);
+
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
@@ -109,12 +116,14 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
       weather.searchByCity(searchquery),
       unsplash.getImage(translatedSearchQuery),
     ]);
-    if (!images.value) {
-      console.log('Ошибка при загрузке фотографии');
-    } else { updateBackground(images.value); }
+
     if (!data.value) {
-      console.log('Ошибка при загрузке информации о погоде');
-    } else { updateWeather(data.value); }
+      throw new Error('Ошибка при загрузке информации о погоде');
+    } else {
+      updateWeather(data.value);
+      updateBackground(images, translatedSearchQuery);
+    }
+
   } catch (error) {
     console.log(error);
   }
@@ -137,7 +146,6 @@ async function searchFormSubmitHandler(evt) {
 
 async function windowLoadHandler() {
   getLocation();
-  // makeRequestsByCity();
 }
 
 export {

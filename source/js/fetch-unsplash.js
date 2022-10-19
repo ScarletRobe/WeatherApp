@@ -8,33 +8,25 @@ export default class Unsplash {
 
   async getImage (keyword) {
     const data = await this.fetchUnsplash(keyword);
-    console.log(data);
-    if (!data) {
-      return;
+    if (!data || data.total === 0) {
+      return data;
     }
 
     const pageAmount = data.total_pages;
-    return this.fetchUnsplash(keyword, getRandomPositiveInteger(0, Math.ceil(pageAmount / 3)));
+    return this.fetchUnsplash(keyword, getRandomPositiveInteger(0, pageAmount >= 3 ? Math.ceil(pageAmount / 3) : pageAmount));
   }
 
   async fetchUnsplash(keyword, page) {
     try {
-      let response;
-      if (page) {
-        response = await fetch(`${this.BASE_URL}?query=${keyword}&page=${page}&per_page=0&client_id=${this.API_KEY}`);
-      } else {
-        response = await fetch(`${this.BASE_URL}?query=${keyword}&per_page=0&client_id=${this.API_KEY}`);
-      }
+      const response = await fetch(`${this.BASE_URL}?query=${keyword}&page=${page ? page : ''}&per_page=0&client_id=${this.API_KEY}`);
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-
       const json = await response.json();
 
       return json;
     } catch (error) {
-      console.log(error);
-
+      console.error(error);
     }
   }
 }
