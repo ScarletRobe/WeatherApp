@@ -10,10 +10,13 @@ const weather = new Weather();
 const unsplash = new Unsplash();
 const myMemory = new MyMemory();
 
+const container = document.querySelector('.card');
+
 let weatherWindowComponent = null;
 
-// const availableScreenWidth = window.screen.availWidth;
 let timeUpdateIntervalId;
+
+// const availableScreenWidth = window.screen.availWidth;
 
 // const sunInfoContainerElement = otherInfoContainerElement.querySelector('.card__sun');
 // const sunriseElement = sunInfoContainerElement.querySelector('.card__sunrise');
@@ -41,17 +44,20 @@ const calculateLocalTime = (timezone) => {
 };
 
 
-const updateWeather = (data) => {
-  if(timeUpdateIntervalId) {
+const renderWeather = (data) => {
+  if (timeUpdateIntervalId) {
     clearInterval(timeUpdateIntervalId);
   }
 
   if (weatherWindowComponent) {
-    weatherWindowComponent.removeElement();
+    const prevWeatherWindowComponent = weatherWindowComponent;
+    weatherWindowComponent = new WeatherWindowView(data, searchFormSubmitHandler);
+    container.replaceChild(weatherWindowComponent.element, prevWeatherWindowComponent.element);
+    prevWeatherWindowComponent.removeElement();
+  } else {
+    weatherWindowComponent = new WeatherWindowView(data, searchFormSubmitHandler);
+    container.insertAdjacentElement('afterbegin', weatherWindowComponent.element);
   }
-
-  weatherWindowComponent = new WeatherWindowView(data, searchFormSubmitHandler);
-  document.body.insertAdjacentElement('afterbegin', weatherWindowComponent.element);
 
   timeUpdateIntervalId = setInterval(() => weatherWindowComponent.updateLocalTime(calculateLocalTime(data.timezone)), 1000);
 
@@ -77,7 +83,7 @@ async function makeRequestsByCoords (lat, lon) {
     if (!data) {
       throw new Error('Ошибка при загрузке информации о погоде');
     } else {
-      updateWeather(data);
+      renderWeather(data);
     }
 
     const images = await unsplash.getImage(data.name);
@@ -98,7 +104,7 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
     if (!data.value) {
       throw new Error('Ошибка при загрузке информации о погоде');
     } else {
-      updateWeather(data.value);
+      renderWeather(data.value);
       updateBackground(images.value, translatedSearchQuery);
     }
 
