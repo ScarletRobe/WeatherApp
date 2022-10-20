@@ -1,4 +1,3 @@
-import { initSearchForm, windowLoadHandler } from './search.js';
+import { windowLoadHandler } from './search.js';
 
 window.addEventListener('load', windowLoadHandler);
-initSearchForm();

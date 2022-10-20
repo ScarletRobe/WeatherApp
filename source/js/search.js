@@ -2,39 +2,22 @@ import Weather from './fetch-weather.js';
 import Unsplash from './fetch-unsplash.js';
 import MyMemory from './fetch-mymemory.js';
 
+import WeatherWindowView from './view/weather-window-view.js';
+
 // Переменные
 
 const weather = new Weather();
 const unsplash = new Unsplash();
 const myMemory = new MyMemory();
 
+let weatherWindowComponent = null;
+
 // const availableScreenWidth = window.screen.availWidth;
 let timeUpdateIntervalId;
-
-// Элементы DOM
-
-const searchFormElement = document.querySelector('#search');
-const searchFormInputElement = searchFormElement.querySelector('.card__search-bar');
-
-const weatherTitleElement = document.querySelector('.card__city');
-const temperatureElement = document.querySelector('.card__temperature');
-const iconElement = document.querySelector('.card__icon');
-
-const detailsContainerElement = document.querySelector('.card__details');
-const weatherDescriptionElement = detailsContainerElement.querySelector('.card__description');
-const windSpeedElement = detailsContainerElement.querySelector('.card__wind-speed');
-const humidityElement = detailsContainerElement.querySelector('.card__humidity');
-const pressureElement = detailsContainerElement.querySelector('.card__pressure');
-
-const otherInfoContainerElement = document.querySelector('.card__other-info');
-const dateElement = otherInfoContainerElement.querySelector('.card__date');
-const timeElement = otherInfoContainerElement.querySelector('.card__time');
 
 // const sunInfoContainerElement = otherInfoContainerElement.querySelector('.card__sun');
 // const sunriseElement = sunInfoContainerElement.querySelector('.card__sunrise');
 // const sunsetElement = sunInfoContainerElement.querySelector('.card__sunset');
-
-//
 
 const getLocation = () => {
   const getCoords = (geolocation) => {
@@ -57,25 +40,20 @@ const calculateLocalTime = (timezone) => {
   };
 };
 
-const displayLocalTime = (timezone) => {
-  const localDate = calculateLocalTime(timezone);
-  dateElement.textContent = `Date: ${localDate.date}`;
-  timeElement.textContent = `Current time: ${localDate.time}`;
-};
 
 const updateWeather = (data) => {
   if(timeUpdateIntervalId) {
     clearInterval(timeUpdateIntervalId);
   }
 
-  weatherTitleElement.textContent = `Weather in ${data.name}`;
-  temperatureElement.textContent = `${Math.round(data.main.temp)}°C`;
-  iconElement.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
-  weatherDescriptionElement.textContent = data.weather[0].description;
-  windSpeedElement.textContent = `Wind speed: ${data.wind.speed} km/h`;
-  humidityElement.textContent = `Humidity: ${data.main.humidity}%`;
-  pressureElement.textContent = `Pressure: ${data.main.pressure} hPa`;
-  timeUpdateIntervalId = setInterval(() => displayLocalTime(data.timezone), 1000);
+  if (weatherWindowComponent) {
+    weatherWindowComponent.removeElement();
+  }
+
+  weatherWindowComponent = new WeatherWindowView(data, searchFormSubmitHandler);
+  document.body.insertAdjacentElement('afterbegin', weatherWindowComponent.element);
+
+  timeUpdateIntervalId = setInterval(() => weatherWindowComponent.updateLocalTime(calculateLocalTime(data.timezone)), 1000);
 
   // sunriseElement.textContent = `Sunrise: ${new Date((data.sys.sunrise + data.timezone * 60) * 1000).toLocaleTimeString()}`;
   // console.log(data.sys.sunrise * 1000, (data.sys.sunrise + data.timezone * 60) * 1000);
@@ -85,7 +63,7 @@ const updateWeather = (data) => {
 
 const updateBackground = (images, searchQuery) => {
   if (images) {
-    document.body.style.background = `url(${images.results[0].urls.regular})`;
+    document.body.style.background = `url(${images.results[0].urls.raw})`;
   } else {
     document.body.style.background = `url(https://source.unsplash.com/1600x900/?${searchQuery})`;
   }
@@ -121,7 +99,7 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
       throw new Error('Ошибка при загрузке информации о погоде');
     } else {
       updateWeather(data.value);
-      updateBackground(images, translatedSearchQuery);
+      updateBackground(images.value, translatedSearchQuery);
     }
 
   } catch (error) {
@@ -129,19 +107,14 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
   }
 }
 
-const initSearchForm = async () => {
-  searchFormElement.addEventListener('submit', searchFormSubmitHandler);
-};
-
-async function searchFormSubmitHandler(evt) {
+async function searchFormSubmitHandler(evt, query) {
   evt.preventDefault();
   try {
-    const translatedSearchQuery = await myMemory.getTranslation(searchFormInputElement.value);
-    makeRequestsByCity(searchFormInputElement.value, translatedSearchQuery);
+    const translatedSearchQuery = await myMemory.getTranslation(query);
+    makeRequestsByCity(query, translatedSearchQuery);
   } catch (error) {
     console.error(error);
   }
-  searchFormInputElement.value = '';
 }
 
 async function windowLoadHandler() {
@@ -149,6 +122,5 @@ async function windowLoadHandler() {
 }
 
 export {
-  initSearchForm,
   windowLoadHandler
 };
