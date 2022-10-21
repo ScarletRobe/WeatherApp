@@ -1,6 +1,6 @@
-import Weather from './fetch-weather.js';
-import Unsplash from './fetch-unsplash.js';
-import MyMemory from './fetch-mymemory.js';
+import Weather from './fetch/fetch-weather.js';
+import Unsplash from './fetch/fetch-unsplash.js';
+import MyMemory from './fetch/fetch-mymemory.js';
 
 import WeatherWindowView from './view/weather-window-view.js';
 

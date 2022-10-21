@@ -1,4 +1,4 @@
-import AbstractView from './abstract-view.js';
+import AbstractView from '../abstract-view.js';
 
 const getGuessTemperatureTemplate = (cityInfo) => (
   `<div class="guess">
