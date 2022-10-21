@@ -1,6 +1,6 @@
 {
   "author": "Leonid Chernyakov",
-  "name": "name",
+  "name": "WeatherApp",
   "private": true,
   "description": "description",
   "devDependencies": {
@@ -8,6 +8,8 @@
     "autoprefixer": "10.4.0",
     "browser-sync": "2.27.7",
     "del": "^7.0.0",
+    "eslint": "^8.21.0",
+    "eslint-config-htmlacademy": "^6.0.0",
     "gulp": "4.0.2",
     "gulp-dart-sass": "^1.0.2",
     "gulp-htmlmin": "^5.0.1",
@@ -19,9 +21,7 @@
     "postcss": "8.3.11",
     "postcss-csso": "^6.0.0",
     "stylelint": "13.13.1",
-    "stylelint-config-htmlacademy": "0.1.11",
-    "eslint": "^8.21.0",
-    "eslint-config-htmlacademy": "^6.0.0"
+    "stylelint-config-htmlacademy": "0.1.11"
   },
   "scripts": {
     "editorconfig": "editorconfig-cli",
