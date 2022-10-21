@@ -1,11 +1,11 @@
-import Geonames from './fetch-geonames.js';
-import Weather from './fetch-weather.js';
+import Geonames from './fetch/fetch-geonames.js';
+import Weather from './fetch/fetch-weather.js';
 
-import GuessTemperatureView from './view/guess-temperature-view.js';
-import GuessResultView from './view/guess-result-view.js';
+import GuessTemperatureView from './view/guess/guess-temperature-view.js';
+import GuessResultView from './view/guess/guess-result-view.js';
 
 import { calculateLocalTime } from './utils.js';
-import { GuessMode } from './const.js';
+import { GuessMode, GuessComponents } from './const.js';
 
 const geonames = new Geonames();
 const weather = new Weather();
@@ -26,51 +26,82 @@ let weatherInfo;
 let cityInfo;
 let currentMode = GuessMode.QUESTION;
 
-const renderGuessComponent = () => {
+const renderGuessComponent = (payload) => {
+  let component;
+  let prevComponent;
+
   if (timeUpdateIntervalId) {
     clearInterval(timeUpdateIntervalId);
   }
 
-  if (guessTemperatureComponent) {
-    const prevGuessTemperatureComponent = guessTemperatureComponent;
-    guessTemperatureComponent = new GuessTemperatureView(cityInfo, weatherInfo, guessFormSubmitHandler);
-    container.replaceChild(guessTemperatureComponent.element, prevGuessTemperatureComponent.element);
-    prevGuessTemperatureComponent.removeElement();
+  switch (payload.component) {
+    case (GuessComponents.TEMPERATURE):
+      prevComponent = guessTemperatureComponent;
+      guessTemperatureComponent = new GuessTemperatureView(cityInfo, weatherInfo, guessFormSubmitHandler);
+      component = guessTemperatureComponent;
+      break;
+    case (GuessComponents.RESULT):
+      prevComponent = guessResultComponent;
+      guessResultComponent = new GuessResultView(cityInfo, weatherInfo, payload.results);
+      component = guessResultComponent;
+      break;
+  }
+
+  if (prevComponent) {
+    container.replaceChild(component.element, prevComponent.element);
+    prevComponent.removeElement();
   } else {
-    guessTemperatureComponent = new GuessTemperatureView(cityInfo, weatherInfo, guessFormSubmitHandler);
-    container.insertAdjacentElement('afterbegin', guessTemperatureComponent.element);
+    container.insertAdjacentElement('afterbegin', component.element);
   }
 
-  if (currentMode === GuessMode.QUESTION) {
-    guessTemperatureComponent.setSubmitHandler();
+  switch (currentMode) {
+    case (GuessMode.QUESTION):
+      guessTemperatureComponent.setSubmitHandler();
+      break;
   }
 
-  guessTemperatureComponent.updateLocalTime(calculateLocalTime(weatherInfo.timezone));
-  timeUpdateIntervalId = setInterval(() => guessTemperatureComponent.updateLocalTime(calculateLocalTime(weatherInfo.timezone)), 1000);
-
+  component.updateLocalTime(calculateLocalTime(weatherInfo.timezone));
+  timeUpdateIntervalId = setInterval(() => component.updateLocalTime(calculateLocalTime(weatherInfo.timezone)), 1000);
 };
 
-const removeGuessComponent = () => {
-  container.removeChild(guessTemperatureComponent.element);
-  guessTemperatureComponent.removeElement();
-  guessTemperatureComponent = null;
+const removeGuessComponent = (component) => {
+  switch (component) {
+    case GuessComponents.TEMPERATURE:
+      if (guessTemperatureComponent) {
+        container.removeChild(guessTemperatureComponent.element);
+        guessTemperatureComponent.removeElement();
+        guessTemperatureComponent = null;
+      }
+      break;
+    case GuessComponents.RESULT:
+      if (guessResultComponent) {
+        container.removeChild(guessResultComponent.element);
+        guessResultComponent.removeElement();
+        guessResultComponent = null;
+      }
+      break;
+    default:
+      removeGuessComponent(GuessComponents.TEMPERATURE);
+      removeGuessComponent(GuessComponents.RESULT);
+  }
   clearInterval(timeUpdateIntervalId);
 };
 
 const showGuessResult = (results) => {
-  guessResultComponent = new GuessResultView(cityInfo, weatherInfo, results);
-  container.replaceChild(guessResultComponent.element, guessTemperatureComponent.element);
+  removeGuessComponent(GuessComponents.TEMPERATURE);
+  renderGuessComponent({
+    component: GuessComponents.RESULT,
+    results,
+  });
   guessResultComponent.manageBtnVisibility(true);
-
-  guessResultComponent.updateLocalTime(calculateLocalTime(weatherInfo.timezone));
-  timeUpdateIntervalId = setInterval(() => guessResultComponent.updateLocalTime(calculateLocalTime(weatherInfo.timezone)), 1000);
-
 };
 
 const initGuessComponent = async () => {
   cityInfo = (await geonames.getCityInfo()).geonames[0];
   weatherInfo = await weather.searchByCity(cityInfo.name);
-  renderGuessComponent();
+  renderGuessComponent({
+    component: GuessComponents.TEMPERATURE,
+  });
 };
 
 function guessFormSubmitHandler(inputValue) {
