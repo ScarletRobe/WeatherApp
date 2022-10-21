@@ -1,3 +1,5 @@
+import AbstractView from './abstract-view.js';
+
 const getWeatherWindowTemplate = (data) => (
   `<div class="wrapper">
     <form class="card__search" id="search">
@@ -28,22 +30,17 @@ const getWeatherWindowTemplate = (data) => (
   </div>`
 );
 
-export default class WeatherWindowView {
-  #element = null;
+export default class WeatherWindowView extends AbstractView{
   #cb = null;
 
   constructor(data, formSubmitCallback) {
+    super();
     this.data = data;
     this.#cb = formSubmitCallback;
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = this.#createElement(getWeatherWindowTemplate(this.data));
-      this.#setSubmitHandler();
-    }
-
-    return this.#element;
+  get template() {
+    return getWeatherWindowTemplate(this.data);
   }
 
   updateLocalTime(localDate) {
@@ -51,21 +48,10 @@ export default class WeatherWindowView {
     this.element.querySelector('.card__time').textContent = `Current time: ${localDate.time}`;
   }
 
-  removeElement() {
-    this.#element = null;
-  }
-
-  #createElement(template) {
-    const newElement = document.createElement('div');
-    newElement.innerHTML = template;
-
-    return newElement.firstElementChild;
-  };
-
-  #setSubmitHandler() {
+  setSubmitHandler() {
     this.element.querySelector('.card__search').addEventListener('submit', (evt) => {
       evt.preventDefault();
-      this.#cb(evt, this.element.querySelector('.card__search-bar').value);
+      this.#cb(this.element.querySelector('.card__search-bar').value);
       this.element.querySelector('.card__search-bar').value = '';
     });
   }

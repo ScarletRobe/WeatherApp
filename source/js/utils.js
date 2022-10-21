@@ -14,4 +14,17 @@ const getRandomPositiveInteger = (min, max = 0) => {
   return Math.abs(Math.round(min - 0.5 + Math.random() * (max - min + 1)));
 };
 
-export { getRandomPositiveInteger };
+const calculateLocalTime = (timezone) => {
+  const date = new Date();
+  const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
+  const currTime = new Date(utcTime + (1000 * timezone));
+  return {
+    time: currTime.toLocaleTimeString(),
+    date: currTime.toLocaleDateString(),
+  };
+};
+
+export {
+  getRandomPositiveInteger,
+  calculateLocalTime,
+};

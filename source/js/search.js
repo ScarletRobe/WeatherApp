@@ -4,23 +4,24 @@ import MyMemory from './fetch-mymemory.js';
 
 import WeatherWindowView from './view/weather-window-view.js';
 
+import { calculateLocalTime } from './utils.js';
+
 // Переменные
 
 const weather = new Weather();
 const unsplash = new Unsplash();
 const myMemory = new MyMemory();
 
+let timeUpdateIntervalId;
+
+// Элементы DOM
+
 const container = document.querySelector('.card');
 
 let weatherWindowComponent = null;
 
-let timeUpdateIntervalId;
 
 // const availableScreenWidth = window.screen.availWidth;
-
-// const sunInfoContainerElement = otherInfoContainerElement.querySelector('.card__sun');
-// const sunriseElement = sunInfoContainerElement.querySelector('.card__sunrise');
-// const sunsetElement = sunInfoContainerElement.querySelector('.card__sunset');
 
 const getLocation = () => {
   const getCoords = (geolocation) => {
@@ -33,18 +34,7 @@ const getLocation = () => {
   });
 };
 
-const calculateLocalTime = (timezone) => {
-  const date = new Date();
-  const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
-  const currTime = new Date(utcTime + (1000 * timezone));
-  return {
-    time: currTime.toLocaleTimeString(),
-    date: currTime.toLocaleDateString(),
-  };
-};
-
-
-const renderWeather = (data) => {
+const renderWeatherComponent = (data) => {
   if (timeUpdateIntervalId) {
     clearInterval(timeUpdateIntervalId);
   }
@@ -58,7 +48,9 @@ const renderWeather = (data) => {
     weatherWindowComponent = new WeatherWindowView(data, searchFormSubmitHandler);
     container.insertAdjacentElement('afterbegin', weatherWindowComponent.element);
   }
+  weatherWindowComponent.setSubmitHandler();
 
+  weatherWindowComponent.updateLocalTime(calculateLocalTime(data.timezone));
   timeUpdateIntervalId = setInterval(() => weatherWindowComponent.updateLocalTime(calculateLocalTime(data.timezone)), 1000);
 
   // sunriseElement.textContent = `Sunrise: ${new Date((data.sys.sunrise + data.timezone * 60) * 1000).toLocaleTimeString()}`;
@@ -67,13 +59,19 @@ const renderWeather = (data) => {
   // sunsetElement.textContent = `Sunset: ${new Date((data.sys.sunset + data.timezone * 60) * 1000).toLocaleTimeString()}`;
 };
 
+const removeWeatherComponent = () => {
+  container.removeChild(weatherWindowComponent.element);
+  weatherWindowComponent.removeElement();
+  weatherWindowComponent = null;
+  clearInterval(timeUpdateIntervalId);
+};
+
 const updateBackground = (images, searchQuery) => {
   if (images) {
     document.body.style.background = `url(${images.results[0].urls.raw})`;
   } else {
     document.body.style.background = `url(https://source.unsplash.com/1600x900/?${searchQuery})`;
   }
-  // document.body.style.background = `url(${images.results[0].urls.raw}&w=${availableScreenWidth}&dpr=2&crop=faces,entropy)`;
 };
 
 async function makeRequestsByCoords (lat, lon) {
@@ -83,7 +81,7 @@ async function makeRequestsByCoords (lat, lon) {
     if (!data) {
       throw new Error('Ошибка при загрузке информации о погоде');
     } else {
-      renderWeather(data);
+      renderWeatherComponent(data);
     }
 
     const images = await unsplash.getImage(data.name);
@@ -104,7 +102,7 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
     if (!data.value) {
       throw new Error('Ошибка при загрузке информации о погоде');
     } else {
-      renderWeather(data.value);
+      renderWeatherComponent(data.value);
       updateBackground(images.value, translatedSearchQuery);
     }
 
@@ -113,8 +111,7 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
   }
 }
 
-async function searchFormSubmitHandler(evt, query) {
-  evt.preventDefault();
+async function searchFormSubmitHandler(query) {
   try {
     const translatedSearchQuery = await myMemory.getTranslation(query);
     makeRequestsByCity(query, translatedSearchQuery);
@@ -128,5 +125,6 @@ async function windowLoadHandler() {
 }
 
 export {
-  windowLoadHandler
+  windowLoadHandler,
+  removeWeatherComponent,
 };
