@@ -6,10 +6,25 @@ export default class Unsplash {
     this.BASE_URL = 'https://api.unsplash.com/search/photos/';
   }
 
-  async getImage (keyword) {
-    const data = await this.fetchUnsplash(keyword);
-    if (!data || data.total === 0) {
-      return data;
+  async getImage (keyword, secondaryKeyword) {
+    const checkUnsplashResponse = (unsplashResponse) => {
+      if (!unsplashResponse || unsplashResponse.total === 0) {
+        return false;
+      }
+      return true;
+    };
+
+    let data = await this.fetchUnsplash(keyword);
+    if (!checkUnsplashResponse(data)) {
+      if (secondaryKeyword) {
+        data = await this.fetchUnsplash(secondaryKeyword);
+        if (!checkUnsplashResponse(data)) {
+          return null;
+        }
+        keyword = secondaryKeyword;
+      } else {
+        return null;
+      }
     }
 
     const pageAmount = data.total_pages;
