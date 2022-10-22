@@ -16,9 +16,6 @@ import imagemin from 'gulp-imagemin';
 export const html = () => {
   return gulp.src('source/**/*.html')
     .pipe(htmlmin({ collapseWhitespace: true }))
-    .pipe(rename({
-      suffix: "-min"
-    }))
     .pipe(gulp.dest('build/'))
 }
 
@@ -86,7 +83,7 @@ const server = (done) => {
   browser.init({
     server: {
       baseDir: 'build',
-      index: 'index-min.html'
+      index: 'index.html'
     },
     cors: true,
     notify: false,
