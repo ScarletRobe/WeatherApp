@@ -11,8 +11,8 @@ body {
   // padding: 1em;
 
   overflow: hidden;
-  background: url('../images/background_moscow.jpg');
-  background-color: gray;
+  // background: url('https://source.unsplash.com/1600x900/?seasons');
+  background-color: black;
   background-position: 50% 50% !important;
   background-size: cover !important;
   background-repeat: no-repeat !important;
@@ -25,6 +25,50 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.control-buttons {
+  display: flex;
+  justify-content: center;
+  // gap: .5em;
+}
+
+.switch-mode-btn {
+  width: 280px;
+  height: 50px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border-right: 1px solid white;
+  color: rgba(255, 255, 255, 0.800);
+  background-color: rgba(0, 0, 0, 0.747);
+
+  transition: background-color .15s, color .15s;
+
+  &:first-child {
+    border-bottom-left-radius: 15% 60%;
+  }
+  &:last-child {
+    border-right: none;
+    border-bottom-right-radius: 15% 60%;
+  }
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.800);
+    color: white;
+  }
+}
+
+.switch-mode-btn--active {
+  background-color: rgba(0, 0, 0, 0.500);
+  color: rgba(255, 255, 255, 0.500);
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.500);
+    color: rgba(255, 255, 255, 0.500);
+  }
 }
 
 .card {
