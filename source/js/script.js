@@ -5,31 +5,32 @@ import { AppMode } from './const.js';
 
 // Элементы DOM
 
-const switchModeBtn = document.querySelector('.switch-mode-btn');
+const controlBtnsContainer = document.querySelector('.control-buttons');
+const controlBtns = controlBtnsContainer.querySelectorAll('.switch-mode-btn');
 
 // Переменные
 
-let currentMode = AppMode.GUESS;
-
 //
 
-switchModeBtn.addEventListener('click', switchAppModeHandler);
+controlBtnsContainer.addEventListener('click', switchAppModeHandler);
 window.addEventListener('load', initGuessComponent);
-
 
 // Обработчики
 
-function switchAppModeHandler() {
-  switch (currentMode) {
-    case AppMode.WEATHER:
-      currentMode = AppMode.GUESS;
+function switchAppModeHandler (evt) {
+  switch (true) {
+    case (evt.target.classList.contains('btn--guess') && !evt.target.classList.contains('switch-mode-btn--active')):
       removeWeatherComponent();
       initGuessComponent();
       break;
-    case AppMode.GUESS:
-      currentMode = AppMode.WEATHER;
+    case (evt.target.classList.contains('btn--weather') && !evt.target.classList.contains('switch-mode-btn--active')):
       removeGuessComponent();
       windowLoadHandler();
       break;
   }
+
+  controlBtns.forEach((btn) => {
+    btn.classList.remove('switch-mode-btn--active');
+  });
+  evt.target.classList.add('switch-mode-btn--active');
 }
