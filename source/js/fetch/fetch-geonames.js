@@ -3,7 +3,7 @@ import { getRandomPositiveInteger } from '../utils.js';
 export default class Geonames {
   constructor() {
     this.USERNAME = 'scrltrb';
-    this.BASE_URL = 'http://api.geonames.org/searchJSON?';
+    this.BASE_URL = '//api.geonames.org/searchJSON?';
     this.RESULTS_COUNT = 5000;
     this.LANG = 'en';
   }
