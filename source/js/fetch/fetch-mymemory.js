@@ -15,7 +15,7 @@ export default class MyMemory {
 
   async fetchMymemory(word) {
     try {
-      const response = await fetch(`${this.BASE_URL}get?q=${word}!&langpair=ru|en`);
+      const response = await fetch(`${this.BASE_URL}get?q=${word}&langpair=ru|en`);
       if(!response.ok) {
         throw new Error(response.statusText);
       }

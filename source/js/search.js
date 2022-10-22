@@ -68,7 +68,7 @@ const removeWeatherComponent = () => {
 
 const updateBackground = (images, searchQuery) => {
   if (images) {
-    document.body.style.background = `url(${images.results[0].urls.raw})`;
+    document.body.style.background = `url(${images.results[0].urls.full})`;
   } else {
     document.body.style.background = `url(https://source.unsplash.com/1600x900/?${searchQuery})`;
   }
@@ -101,10 +101,9 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
 
     if (!data.value) {
       throw new Error('Ошибка при загрузке информации о погоде');
-    } else {
-      renderWeatherComponent(data.value);
-      updateBackground(images.value, translatedSearchQuery);
     }
+    renderWeatherComponent(data.value);
+    updateBackground(images.value, translatedSearchQuery);
 
   } catch (error) {
     console.log(error);

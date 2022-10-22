@@ -9,8 +9,8 @@ const getGuessTemperatureTemplate = (cityInfo) => (
         <h1 class="guess__city">${cityInfo.name}</h1>
       </div>
       <div class="guess__other-info">
-        <div class="guess__date">Date:</div>
-        <div class="guess__time">Current time:</div>
+        <div class="guess__date"></div>
+        <div class="guess__time"></div>
       </div>
     </div>
     <form class="guess__input">
@@ -20,15 +20,14 @@ const getGuessTemperatureTemplate = (cityInfo) => (
 );
 
 export default class GuessTemperatureView extends AbstractView {
-  #cb = null;
   #results = {
     isResults: false
   };
-  constructor(cityInfo, weatherInfo, cb) {
+
+  constructor(cityInfo, weatherInfo) {
     super();
     this.cityInfo = cityInfo;
     this.weatherInfo = weatherInfo;
-    this.#cb = cb;
 
     this.element.style.setProperty('--bg-url', `url('https://openweathermap.org/img/wn/${this.weatherInfo.weather[0].icon}@2x.png')`);
   }
@@ -42,10 +41,10 @@ export default class GuessTemperatureView extends AbstractView {
     this.element.querySelector('.guess__time').textContent = `Current time: ${localDate.time}`;
   }
 
-  setSubmitHandler() {
+  setSubmitHandler(cb) {
     this.element.querySelector('.guess__input').addEventListener('submit', (evt) => {
       evt.preventDefault();
-      this.#cb(this.element.querySelector('.guess__search-bar').value);
+      cb(this.element.querySelector('.guess__search-bar').value);
       this.element.querySelector('.guess__search-bar').value = '';
     });
   }
