@@ -196,6 +196,67 @@ body {
   }
 }
 
+.slide-left {
+  animation: slideLeftToRight 1s;
+  animation-fill-mode: forwards;
+}
+
+.slide-right-to-left {
+  animation: slideRightToLeft 1s;
+  animation-fill-mode: forwards;
+}
+
+.vanish {
+  animation: vanish .15s;
+  animation-fill-mode: forwards;
+}
+
+.appear {
+  animation: appear .15s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes vanish {
+  0% {
+    opacity: 100%;
+  }
+
+  100% {
+    opacity: 0%;
+  }
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0%;
+  }
+
+  100% {
+    opacity: 100%;
+  }
+}
+
+
+@keyframes slideRightToLeft {
+  0% {
+    transform: translateX(100vw);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideLeftToRight {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100vw);
+  }
+}
+
 .visually-hidden {
   display: none;
 }
