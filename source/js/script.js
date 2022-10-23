@@ -17,14 +17,14 @@ window.addEventListener('load', initGuessComponent);
 
 // Обработчики
 
-function switchAppModeHandler (evt) {
+async function switchAppModeHandler (evt) {
   switch (true) {
     case (evt.target.classList.contains('btn--guess') && !evt.target.classList.contains('switch-mode-btn--active')):
       removeWeatherComponent();
       initGuessComponent();
       break;
     case (evt.target.classList.contains('btn--weather') && !evt.target.classList.contains('switch-mode-btn--active')):
-      removeGuessComponent();
+      await removeGuessComponent();
       windowLoadHandler();
       break;
   }
