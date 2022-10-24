@@ -15,16 +15,12 @@ const getWeatherWindowTemplate = (data) => (
       <div class="card__details">
         <div class="card__description">${data.weather[0].description}</div>
         <div class="card__humidity">Humidity: ${data.main.humidity}%</div>
-        <div class="card__wind-speed">Wind speed: ${data.wind.speed} km/h</div>
+        <div class="card__wind-speed">Wind speed: ${data.wind.speed} m/s</div>
         <div class="card__pressure">Pressure: ${data.main.pressure} hPa</div>
       </div>
       <div class="card__other-info">
         <div class="card__date">Date: </div>
         <div class="card__time">Current time:</div>
-        <!-- <div class="card__sun">
-          <div class="card__sunrise">06:00</div>
-          <div class="card__sunset">18:00</div>
-        </div> -->
       </div>
     </div>
   </div>`
