@@ -12,14 +12,11 @@ const geonames = new Geonames();
 const weather = new Weather();
 const unsplash = new Unsplash();
 
-// Элементы DOM
-
-const container = document.querySelector('.card');
-
 // Компоненты
 
 let guessTemperatureComponent = null;
 let guessResultComponent = null;
+let containerComponent = null;
 
 // Переменные
 
@@ -40,79 +37,85 @@ const renderGuessComponent = (payload) => {
     case (GuessComponents.TEMPERATURE):
       prevComponent = guessTemperatureComponent;
       guessTemperatureComponent = new GuessTemperatureView(cityInfo, weatherInfo);
-      container.classList.add('slide-right-to-left');
-      setTimeout(() => {
-        container.classList.remove('slide-right-to-left');
-      }, 1000);
-      guessTemperatureComponent.setSubmitHandler(guessFormSubmitHandler);
+      containerComponent.slideRightToTheLeft(() => {
+        guessTemperatureComponent.setSubmitHandler(guessFormSubmitHandler);
+      });
 
       component = guessTemperatureComponent;
       break;
     case (GuessComponents.RESULT):
       prevComponent = guessResultComponent;
       guessResultComponent = new GuessResultView(cityInfo, weatherInfo, payload.results);
-      guessResultComponent.element.classList.add('appear');
-      setTimeout(() => {
-        guessResultComponent.element.classList.remove('appear');
-      }, 150);
-      guessResultComponent.setNextBtnClickHandler(guessNextBtnHandler);
+      guessResultComponent.appear(() => {
+        guessResultComponent.setNextBtnClickHandler(guessNextBtnHandler);
+      });
 
       component = guessResultComponent;
       break;
   }
 
   if (prevComponent) {
-    container.replaceChild(component.element, prevComponent.element);
+    containerComponent.element.replaceChild(component.element, prevComponent.element);
     prevComponent.removeElement();
   } else {
-    container.insertAdjacentElement('afterbegin', component.element);
-  }
-
-  switch (currentMode) {
-    case (GuessMode.QUESTION):
-      break;
+    containerComponent.element.insertAdjacentElement('afterbegin', component.element);
   }
 
   component.updateLocalTime(calculateLocalTime(weatherInfo.timezone));
   timeUpdateIntervalId = setInterval(() => component.updateLocalTime(calculateLocalTime(weatherInfo.timezone)), 1000);
 };
 
-const removeGuessComponent = async (component) => (
-  new Promise((resolve) => {
-    switch (component) {
+const removeGuessComponent = async (isModeChange = false, componentName) => {
+  if (!componentName) {
+    switch (currentMode) {
+      case(GuessMode.QUESTION):
+        componentName = GuessComponents.TEMPERATURE;
+        break;
+      case(GuessMode.RESULTS):
+        componentName = GuessComponents.RESULT;
+        break;
+    }
+  }
+
+  const prom = new Promise((resolve) => {
+    const removeComponent = (component) => {
+      containerComponent.element.removeChild(component.element);
+      component.removeElement();
+    };
+
+    switch (componentName) {
       case GuessComponents.TEMPERATURE:
         if (guessTemperatureComponent) {
-          guessTemperatureComponent.element.classList.add('vanish');
-          setTimeout(() => {
-            guessTemperatureComponent.element.classList.remove('vanish');
-            container.removeChild(guessTemperatureComponent.element);
-            guessTemperatureComponent.removeElement();
-            guessTemperatureComponent = null;
-            resolve();
-          }, 150);
+          if (isModeChange) {
+            containerComponent.slideLeft(() => {
+              removeComponent(guessTemperatureComponent);
+              guessTemperatureComponent = null;
+              resolve();
+            });
+          } else {
+            guessTemperatureComponent.vanish(() => {
+              removeComponent(guessTemperatureComponent);
+              guessTemperatureComponent = null;
+              resolve();
+            });
+          }
         }
         break;
       case GuessComponents.RESULT:
         if (guessResultComponent) {
-          container.classList.add('slide-left');
-          setTimeout(() => {
-            container.classList.remove('slide-left');
-            container.removeChild(guessResultComponent.element);
-            guessResultComponent.removeElement();
+          containerComponent.slideLeft(() => {
+            removeComponent(guessResultComponent);
             guessResultComponent = null;
             resolve();
-          }, 1000);
+          });
           guessResultComponent.removeDocumentKeydownHandler();
         }
         break;
-      default:
-        removeGuessComponent(GuessComponents.TEMPERATURE);
-        removeGuessComponent(GuessComponents.RESULT);
-        resolve();
     }
-    clearInterval(timeUpdateIntervalId);
-  })
-);
+  });
+
+  return prom;
+};
 
 const updateBackground = (images, city) => {
   if (images) {
@@ -123,7 +126,8 @@ const updateBackground = (images, city) => {
 };
 
 const showGuessResult = async (results) => {
-  await removeGuessComponent(GuessComponents.TEMPERATURE);
+  currentMode = GuessMode.RESULTS;
+  await removeGuessComponent(false, GuessComponents.TEMPERATURE);
   renderGuessComponent({
     component: GuessComponents.RESULT,
     results,
@@ -133,6 +137,7 @@ const showGuessResult = async (results) => {
 };
 
 const showGuessTemperature = (images) => {
+  currentMode = GuessMode.QUESTION;
   renderGuessComponent({
     component: GuessComponents.TEMPERATURE,
   });
@@ -158,13 +163,13 @@ const getDataForGuess = async () => {
   }
 };
 
-const initGuessComponent = async (images) => {
-  images = await getDataForGuess();
+const initGuessComponent = async (container) => {
+  containerComponent = container;
+  const images = await getDataForGuess();
   showGuessTemperature(images);
 };
 
 function guessFormSubmitHandler(inputValue) {
-  currentMode = GuessMode.RESULTS;
   showGuessResult({
     real: Math.round(Number(weatherInfo.main.temp)),
     user: Number(inputValue),
@@ -174,7 +179,7 @@ function guessFormSubmitHandler(inputValue) {
 
 async function guessNextBtnHandler() {
   const [, images] = await Promise.all([
-    removeGuessComponent(GuessComponents.RESULT),
+    removeGuessComponent(false, GuessComponents.RESULT),
     getDataForGuess()
   ]);
 

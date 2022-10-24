@@ -14,14 +14,12 @@ const myMemory = new MyMemory();
 
 let timeUpdateIntervalId;
 
-// Элементы DOM
+// Компоненты
 
-const container = document.querySelector('.card');
-
+let containerComponent = null;
 let weatherWindowComponent = null;
 
-
-// const availableScreenWidth = window.screen.availWidth;
+//
 
 const getLocation = () => {
   const getCoords = (geolocation) => {
@@ -42,28 +40,34 @@ const renderWeatherComponent = (data) => {
   if (weatherWindowComponent) {
     const prevWeatherWindowComponent = weatherWindowComponent;
     weatherWindowComponent = new WeatherWindowView(data, searchFormSubmitHandler);
-    container.replaceChild(weatherWindowComponent.element, prevWeatherWindowComponent.element);
+    containerComponent.element.replaceChild(weatherWindowComponent.element, prevWeatherWindowComponent.element);
     prevWeatherWindowComponent.removeElement();
+    containerComponent.slideRightToTheLeft();
   } else {
     weatherWindowComponent = new WeatherWindowView(data, searchFormSubmitHandler);
-    container.insertAdjacentElement('afterbegin', weatherWindowComponent.element);
+    containerComponent.element.insertAdjacentElement('afterbegin', weatherWindowComponent.element);
+    containerComponent.slideRightToTheLeft();
   }
   weatherWindowComponent.setSubmitHandler();
 
   weatherWindowComponent.updateLocalTime(calculateLocalTime(data.timezone));
   timeUpdateIntervalId = setInterval(() => weatherWindowComponent.updateLocalTime(calculateLocalTime(data.timezone)), 1000);
-
-  // sunriseElement.textContent = `Sunrise: ${new Date((data.sys.sunrise + data.timezone * 60) * 1000).toLocaleTimeString()}`;
-  // console.log(data.sys.sunrise * 1000, (data.sys.sunrise + data.timezone * 60) * 1000);
-  // console.log(new Date(data.sys.sunrise * 1000).getHours(), new Date((data.sys.sunrise + data.timezone * 60) * 1000).toString());
-  // sunsetElement.textContent = `Sunset: ${new Date((data.sys.sunset + data.timezone * 60) * 1000).toLocaleTimeString()}`;
 };
 
-const removeWeatherComponent = () => {
-  container.removeChild(weatherWindowComponent.element);
-  weatherWindowComponent.removeElement();
-  weatherWindowComponent = null;
-  clearInterval(timeUpdateIntervalId);
+const removeWeatherComponent = async () => {
+  if (!weatherWindowComponent) {
+    return;
+  }
+
+  return new Promise((resolve) => {
+    containerComponent.slideLeft(() => {
+      containerComponent.element.removeChild(weatherWindowComponent.element);
+      weatherWindowComponent.removeElement();
+      weatherWindowComponent = null;
+      clearInterval(timeUpdateIntervalId);
+      resolve();
+    });
+  });
 };
 
 const updateBackground = (images, searchQuery) => {
@@ -81,6 +85,7 @@ async function makeRequestsByCoords (lat, lon) {
     if (!data) {
       throw new Error('Ошибка при загрузке информации о погоде');
     } else {
+      await removeWeatherComponent();
       renderWeatherComponent(data);
     }
 
@@ -102,6 +107,7 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
     if (!data.value) {
       throw new Error('Ошибка при загрузке информации о погоде');
     }
+    await removeWeatherComponent();
     renderWeatherComponent(data.value);
     updateBackground(images.value, translatedSearchQuery);
 
@@ -119,7 +125,8 @@ async function searchFormSubmitHandler(query) {
   }
 }
 
-async function windowLoadHandler() {
+async function windowLoadHandler(container) {
+  containerComponent = container;
   getLocation();
 }
 
