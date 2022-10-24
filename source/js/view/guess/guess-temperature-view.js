@@ -1,5 +1,7 @@
 import AbstractView from '../abstract-view.js';
 
+const VANISH_ANIMATION_TIME = 150;
+
 const getGuessTemperatureTemplate = (cityInfo) => (
   `<div class="guess">
     <div class="guess__known-info">
@@ -39,6 +41,14 @@ export default class GuessTemperatureView extends AbstractView {
   updateLocalTime(localDate) {
     this.element.querySelector('.guess__date').textContent = `Date: ${localDate.date}`;
     this.element.querySelector('.guess__time').textContent = `Current time: ${localDate.time}`;
+  }
+
+  vanish(callback) {
+    this.element.classList.add('vanish');
+    setTimeout(() => {
+      this.element.classList.remove('vanish');
+      callback();
+    }, VANISH_ANIMATION_TIME);
   }
 
   setSubmitHandler(cb) {
