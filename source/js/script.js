@@ -1,36 +1,46 @@
 import { windowLoadHandler, removeWeatherComponent } from './search.js';
 import { initGuessComponent, removeGuessComponent } from './guess.js';
 
-import { AppMode } from './const.js';
+import CardContainerView from './view/card-container-view.js';
 
 // Элементы DOM
 
+const appContainer = document.querySelector('.container');
 const controlBtnsContainer = document.querySelector('.control-buttons');
 const controlBtns = controlBtnsContainer.querySelectorAll('.switch-mode-btn');
 
 // Переменные
 
+const cardContainer = new CardContainerView();
+
 //
 
+appContainer.insertAdjacentElement('afterbegin', cardContainer.element);
 controlBtnsContainer.addEventListener('click', switchAppModeHandler);
-window.addEventListener('load', initGuessComponent);
+window.addEventListener('load', () => windowLoadHandler(cardContainer));
 
 // Обработчики
 
 async function switchAppModeHandler (evt) {
-  switch (true) {
-    case (evt.target.classList.contains('btn--guess') && !evt.target.classList.contains('switch-mode-btn--active')):
-      removeWeatherComponent();
-      initGuessComponent();
-      break;
-    case (evt.target.classList.contains('btn--weather') && !evt.target.classList.contains('switch-mode-btn--active')):
-      await removeGuessComponent();
-      windowLoadHandler();
-      break;
-  }
+  if (evt.target.classList.contains('switch-mode-btn') && !evt.target.classList.contains('switch-mode-btn--active')) {
+    controlBtns.forEach((btn) => {
+      btn.classList.add('switch-mode-btn--active');
+    });
 
-  controlBtns.forEach((btn) => {
-    btn.classList.remove('switch-mode-btn--active');
-  });
-  evt.target.classList.add('switch-mode-btn--active');
+    switch (evt.target.control.id) {
+      case ('btn--guess'):
+        await removeWeatherComponent();
+        initGuessComponent(cardContainer);
+        break;
+      case ('btn--weather'):
+        await removeGuessComponent(true);
+        windowLoadHandler(cardContainer);
+        break;
+    }
+
+    controlBtns.forEach((btn) => {
+      btn.classList.remove('switch-mode-btn--active');
+    });
+    evt.target.classList.add('switch-mode-btn--active');
+  }
 }

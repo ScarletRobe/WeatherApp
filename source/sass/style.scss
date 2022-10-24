@@ -46,10 +46,10 @@ body {
 
   transition: background-color .15s, color .15s;
 
-  &:first-child {
+  &:first-of-type {
     border-bottom-left-radius: 15% 60%;
   }
-  &:last-child {
+  &:last-of-type {
     border-right: none;
     border-bottom-right-radius: 15% 60%;
   }

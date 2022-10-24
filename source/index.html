@@ -10,13 +10,15 @@
 
 <body>
   <div class="control-buttons">
-    <div class="switch-mode-btn btn--weather">Weather</div>
-    <div class="switch-mode-btn switch-mode-btn--active btn--guess">Guess</div>
+    <input id="btn--weather" class="visually-hidden" type="radio" name="control-button" checked>
+    <label class="switch-mode-btn switch-mode-btn--active" for="btn--weather">Weather</label>
+    <input id="btn--guess" class="visually-hidden" type="radio" name="control-button">
+    <label class="switch-mode-btn" for="btn--guess">Guess</label>
+    <!-- <div class="switch-mode-btn btn--weather switch-mode-btn--active">Weather</div>
+    <div class="switch-mode-btn btn--guess">Guess</div> -->
   </div>
   <div class="container">
-    <section class="card">
 
-    </section>
   </div>
   <script type="module" src="js/script.js"></script>
 </body>
