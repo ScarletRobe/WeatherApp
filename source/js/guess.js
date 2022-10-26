@@ -72,7 +72,8 @@ const renderGuessComponent = (payload) => {
       containerComponent.switchMode(ContainerMode.SCOREBOARD);
       guessScoreboardComponent = new ScoreboardView(payload.data);
       containerComponent.slideRightToTheLeft(() => {
-        guessScoreboardComponent.setSubmitHandler(guessFormSubmitHandler);
+        guessScoreboardComponent.setSubmitHandler(scoreboardFormSubmitHandler);
+        guessScoreboardComponent.setTryAgainBtnClickHandler(tryAgainBtnClickHandler);
       });
 
       component = guessScoreboardComponent;
@@ -219,6 +220,8 @@ const initGuessComponent = async (container) => {
   showGuessTemperature(images);
 };
 
+// Обработчики
+
 function guessFormSubmitHandler(inputValue) {
   const diff = Number(inputValue) - Number(Math.round(weatherInfo.main.temp));
   totalScore -= Math.abs(diff);
@@ -241,6 +244,16 @@ async function guessNextBtnHandler() {
   ]);
 
   showGuessTemperature(images);
+}
+
+async function tryAgainBtnClickHandler() {
+  await removeGuessComponent(false, GuessComponents.SCOREBOARD);
+  initGuessComponent(containerComponent);
+}
+
+async function scoreboardFormSubmitHandler(user) {
+  const scoreboard = (await fetchScoreboard.patchScoreboard(user)).scoreboard;
+  guessScoreboardComponent.rerenderScoreboard(scoreboard);
 }
 
 export {
