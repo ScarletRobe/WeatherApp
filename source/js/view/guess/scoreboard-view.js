@@ -1,7 +1,7 @@
 import AbstractView from '../abstract-view.js';
 
 const getScoreboardListTemplate = (scoreboard) => (
-  scoreboard.map((item) => `<li class="scoreboard__item">${item.nickname}: ${item.score}</li>`).join('\n')
+  scoreboard.map((item) => `<li class="scoreboard__item">${item.userName}: ${item.score}</li>`).join('\n')
 );
 
 const getScoreboardDescriptionTemplate = (place) => place ? `<h2 class="scoreboard__description vh">Your place in scoreboard: ${place}!</h2>` : '';
@@ -22,7 +22,7 @@ const getScoreboardFormtemplate = (place) => (
 
 const getScoreboardTemplate = (scoreboard, totalScore, place) => (
   `<div class="scoreboard">
-  <h1 class="scoreboard__header">You scored: ${totalScore}!</h1>
+  <h1 class="scoreboard__header">You scored: ${totalScore >= 0 ? totalScore : 0}!</h1>
 
   ${getScoreboardDescriptionTemplate(place)}
 
@@ -47,17 +47,41 @@ export default class ScoreboardView extends AbstractView {
     this.scoreboard = scoreboard;
     this.totalScore = totalScore;
     this.place = place;
+    this.isFormSend = false;
   }
 
   get template() {
     return getScoreboardTemplate(this.scoreboard, this.totalScore, this.place);
   }
 
-  setSubmitHandler(cb) {
+  setSubmitHandler = (cb) => {
+    if (!this.element.querySelector('.scoreboard__form')) {
+      this.isFormSend = true;
+      return;
+    }
+
     this.element.querySelector('.scoreboard__form').addEventListener('submit', (evt) => {
       evt.preventDefault();
-      cb(this.element.querySelector('.scoreboard__search-bar').value);
-      this.element.querySelector('.guess__search-bar').value = '';
+      const userName = String(document.querySelector('.scoreboard__search-bar').value);
+      cb({
+        place: Number(this.place),
+        userName,
+        score: Number(this.totalScore),
+      });
+      this.element.querySelector('.scoreboard__search-bar').value = '';
+    });
+  };
+
+  setTryAgainBtnClickHandler(cb) {
+    this.element.querySelector('.scoreboard__try-again-btn').addEventListener('click', (evt) => {
+      evt.preventDefault();
+      if (!this.isFormSend) {
+        // eslint-disable-next-line no-alert
+        if (!confirm('Вы не сохранили результат, вы уверены, что желаете продолжить?')) {
+          return;
+        }
+      }
+      cb();
     });
   }
 }
