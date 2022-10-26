@@ -48,7 +48,7 @@ const renderGuessComponent = (payload) => {
   switch (payload.component) {
     case (GuessComponents.TEMPERATURE):
       prevComponent = guessTemperatureComponent;
-      guessTemperatureComponent = new GuessTemperatureView(cityInfo, weatherInfo);
+      guessTemperatureComponent = new GuessTemperatureView(cityInfo, weatherInfo, questionNum, MAX_QUESTIONS_AMOUNT);
       containerComponent.slideRightToTheLeft(() => {
         guessTemperatureComponent.setSubmitHandler(guessFormSubmitHandler);
       });

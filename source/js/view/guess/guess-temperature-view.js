@@ -2,8 +2,9 @@ import AbstractView from '../abstract-view.js';
 
 const VANISH_ANIMATION_TIME = 150;
 
-const getGuessTemperatureTemplate = (cityInfo) => (
+const getGuessTemperatureTemplate = (cityInfo, questionNum, questionsAmount) => (
   `<div class="guess">
+   <h2 class="guess__question-number">${questionNum} / ${questionsAmount}</h2>
     <div class="guess__known-info">
       <div class="guess__about">
         <h1 class="guess__country">${cityInfo.countryName},</h1>
@@ -26,16 +27,18 @@ export default class GuessTemperatureView extends AbstractView {
     isResults: false
   };
 
-  constructor(cityInfo, weatherInfo) {
+  constructor(cityInfo, weatherInfo, questionNum, questionsAmount) {
     super();
     this.cityInfo = cityInfo;
     this.weatherInfo = weatherInfo;
+    this.questionNum = questionNum;
+    this.questionsAmount = questionsAmount;
 
     this.element.style.setProperty('--bg-url', `url('https://openweathermap.org/img/wn/${this.weatherInfo.weather[0].icon}@2x.png')`);
   }
 
   get template() {
-    return getGuessTemperatureTemplate(this.cityInfo, this.#results);
+    return getGuessTemperatureTemplate(this.cityInfo, this.questionNum, this.questionsAmount);
   }
 
   updateLocalTime(localDate) {

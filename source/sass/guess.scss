@@ -7,6 +7,10 @@
   text-shadow: 1px 1px 0 black;
 }
 
+.guess__question-number {
+  text-align: end;
+}
+
 .guess__known-info {
   &::after {
     content: "";
