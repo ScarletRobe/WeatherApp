@@ -37,6 +37,14 @@ export default class GuessTemperatureView extends AbstractView {
     this.element.style.setProperty('--bg-url', `url('https://openweathermap.org/img/wn/${this.weatherInfo.weather[0].icon}@2x.png')`);
   }
 
+  get element() {
+    const element = super.element;
+    if (this.questionNum > 1) {
+      element.querySelector('.guess__search-bar').focus();
+    }
+    return element;
+  }
+
   get template() {
     return getGuessTemperatureTemplate(this.cityInfo, this.questionNum, this.questionsAmount);
   }
