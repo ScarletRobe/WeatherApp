@@ -30,7 +30,8 @@
     "eslint": "eslint source/js/",
     "images": "gulp images",
     "build": "gulp build",
-    "start": "gulp"
+    "start": "gulp",
+    "server": "node ./server/scoreboard.js"
   },
   "browserslist": [
     "last 2 versions",

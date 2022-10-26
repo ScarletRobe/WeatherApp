@@ -1,0 +1,17 @@
+{
+  "name": "weather_app_scoreboard",
+  "version": "1.0.0",
+  "description": "server_for_scoreboard",
+  "main": "scoreboard.js",
+  "scripts": {
+    "server": "node scoreboard.js"
+  },
+  "author": "Leonid Chernyakov",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2"
+  },
+  "type": "module"
+}
