@@ -1,25 +1,31 @@
 import Geonames from './fetch/fetch-geonames.js';
 import Weather from './fetch/fetch-weather.js';
 import Unsplash from './fetch/fetch-unsplash.js';
+import Scoreboard from './fetch/fetch-scoreboard.js';
 
 import GuessTemperatureView from './view/guess/guess-temperature-view.js';
 import GuessResultView from './view/guess/guess-result-view.js';
+import ScoreboardView from './view/guess/scoreboard-view.js';
 
 import { calculateLocalTime } from './utils.js';
-import { GuessMode, GuessComponents } from './const.js';
+import { GuessMode, GuessComponents, ContainerMode } from './const.js';
 
 const geonames = new Geonames();
 const weather = new Weather();
 const unsplash = new Unsplash();
+const scoreboard = new Scoreboard();
 
 // Компоненты
 
 let guessTemperatureComponent = null;
 let guessResultComponent = null;
+let guessScoreboardComponent = null;
 let containerComponent = null;
 
 // Переменные
 
+const MAX_QUESTIONS_AMOUNT = 1;
+let questionNum = null;
 let timeUpdateIntervalId;
 let weatherInfo;
 let cityInfo;
@@ -28,6 +34,11 @@ let currentMode = GuessMode.QUESTION;
 const renderGuessComponent = (payload) => {
   let component;
   let prevComponent;
+
+  const updateTime = () => {
+    component.updateLocalTime(calculateLocalTime(weatherInfo.timezone));
+    timeUpdateIntervalId = setInterval(() => component.updateLocalTime(calculateLocalTime(weatherInfo.timezone)), 1000);
+  };
 
   if (timeUpdateIntervalId) {
     clearInterval(timeUpdateIntervalId);
@@ -42,15 +53,28 @@ const renderGuessComponent = (payload) => {
       });
 
       component = guessTemperatureComponent;
+      updateTime();
       break;
+
     case (GuessComponents.RESULT):
       prevComponent = guessResultComponent;
-      guessResultComponent = new GuessResultView(cityInfo, weatherInfo, payload.results);
+      guessResultComponent = new GuessResultView(cityInfo, weatherInfo, payload.data);
       guessResultComponent.appear(() => {
         guessResultComponent.setNextBtnClickHandler(guessNextBtnHandler);
       });
 
       component = guessResultComponent;
+      updateTime();
+      break;
+
+    case (GuessComponents.SCOREBOARD):
+      containerComponent.switchMode(ContainerMode.SCOREBOARD);
+      guessScoreboardComponent = new ScoreboardView(payload.data);
+      containerComponent.slideRightToTheLeft(() => {
+        guessScoreboardComponent.setSubmitHandler(guessFormSubmitHandler);
+      });
+
+      component = guessScoreboardComponent;
       break;
   }
 
@@ -60,9 +84,6 @@ const renderGuessComponent = (payload) => {
   } else {
     containerComponent.element.insertAdjacentElement('afterbegin', component.element);
   }
-
-  component.updateLocalTime(calculateLocalTime(weatherInfo.timezone));
-  timeUpdateIntervalId = setInterval(() => component.updateLocalTime(calculateLocalTime(weatherInfo.timezone)), 1000);
 };
 
 const removeGuessComponent = async (isModeChange = false, componentName) => {
@@ -73,6 +94,9 @@ const removeGuessComponent = async (isModeChange = false, componentName) => {
         break;
       case(GuessMode.RESULTS):
         componentName = GuessComponents.RESULT;
+        break;
+      case(GuessMode.SCOREBOARD):
+        componentName = GuessComponents.SCOREBOARD;
         break;
     }
   }
@@ -111,6 +135,15 @@ const removeGuessComponent = async (isModeChange = false, componentName) => {
           guessResultComponent.removeDocumentKeydownHandler();
         }
         break;
+      case GuessComponents.SCOREBOARD:
+        if (guessScoreboardComponent) {
+          containerComponent.slideLeft(() => {
+            removeComponent(guessScoreboardComponent);
+            guessScoreboardComponent = null;
+            resolve();
+          });
+        }
+        break;
     }
   });
 
@@ -130,7 +163,7 @@ const showGuessResult = async (results) => {
   await removeGuessComponent(false, GuessComponents.TEMPERATURE);
   renderGuessComponent({
     component: GuessComponents.RESULT,
-    results,
+    data: results,
   });
   guessResultComponent.manageBtnVisibility(true);
   guessResultComponent.setDocumentKeydownHandler(guessNextBtnHandler);
@@ -142,6 +175,14 @@ const showGuessTemperature = (images) => {
     component: GuessComponents.TEMPERATURE,
   });
   updateBackground(images.value, cityInfo.name);
+};
+
+const showGuessScoreboard = async () => {
+  currentMode = GuessMode.SCOREBOARD;
+  renderGuessComponent({
+    component: GuessComponents.SCOREBOARD,
+    data: 1,
+  });
 };
 
 const getDataForGuess = async () => {
@@ -164,6 +205,7 @@ const getDataForGuess = async () => {
 };
 
 const initGuessComponent = async (container) => {
+  questionNum = 1;
   containerComponent = container;
   const images = await getDataForGuess();
   showGuessTemperature(images);
@@ -178,6 +220,11 @@ function guessFormSubmitHandler(inputValue) {
 }
 
 async function guessNextBtnHandler() {
+  if (++questionNum > MAX_QUESTIONS_AMOUNT) {
+    await removeGuessComponent(false, GuessComponents.RESULT);
+    showGuessScoreboard();
+    return;
+  }
   const [, images] = await Promise.all([
     removeGuessComponent(false, GuessComponents.RESULT),
     getDataForGuess()
