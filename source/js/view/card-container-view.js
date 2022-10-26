@@ -1,4 +1,5 @@
 import AbstractView from './abstract-view.js';
+import { ContainerMode } from '../const.js';
 
 const SLIDE_ANIMATION_TIME = 1000;
 
@@ -29,6 +30,17 @@ export default class CardContainerView extends AbstractView {
       this.element.classList.remove('slide-right-to-left');
       callback?.();
     }, SLIDE_ANIMATION_TIME);
+  }
+
+  switchMode(mode) {
+    switch (mode) {
+      case ContainerMode.NORMAL:
+        this.element.classList.remove('card--scoreboard');
+        break;
+      case ContainerMode.SCOREBOARD:
+        this.element.classList.add('card--scoreboard');
+        break;
+    }
   }
 
   manageVisibility(isVisible = true) {
