@@ -260,4 +260,14 @@
   border: none;
   color: white;
   background-color: rgba(0, 0, 0, 0.6);
+
+  transition: background-color .15s;
+
+  &:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  &:active {
+  background-color: rgba(0, 0, 0, 0.7);
+  }
 }
