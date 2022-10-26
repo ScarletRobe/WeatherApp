@@ -23,7 +23,7 @@ export default class MyMemory {
 
       return json;
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
 }
