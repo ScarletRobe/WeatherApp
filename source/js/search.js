@@ -21,16 +21,20 @@ let weatherWindowComponent = null;
 
 //
 
-const getLocation = () => {
-  const getCoords = (geolocation) => {
-    const lat = geolocation.coords.latitude;
-    const lon = geolocation.coords.longitude;
-    makeRequestsByCoords(lat, lon);
-  };
-  navigator.geolocation.getCurrentPosition(getCoords, () => {
-    makeRequestsByCity();
-  });
-};
+const getLocation = async () => (
+  new Promise((resolve) => {
+    const getCoords = (geolocation) => {
+      const lat = geolocation.coords.latitude;
+      const lon = geolocation.coords.longitude;
+      makeRequestsByCoords(lat, lon);
+      resolve();
+    };
+    navigator.geolocation.getCurrentPosition(getCoords, () => {
+      makeRequestsByCity();
+      resolve();
+    });
+  })
+);
 
 const renderWeatherComponent = (data) => {
   if (timeUpdateIntervalId) {
@@ -127,7 +131,7 @@ async function searchFormSubmitHandler(query) {
 
 async function windowLoadHandler(container) {
   containerComponent = container;
-  getLocation();
+  await getLocation();
 }
 
 export {

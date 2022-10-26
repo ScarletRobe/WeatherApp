@@ -17,7 +17,7 @@ const cardContainer = new CardContainerView();
 
 appContainer.insertAdjacentElement('afterbegin', cardContainer.element);
 controlBtnsContainer.addEventListener('click', switchAppModeHandler);
-window.addEventListener('load', () => windowLoadHandler(cardContainer));
+window.addEventListener('load', appLoadHandler);
 
 // Обработчики
 
@@ -43,4 +43,9 @@ async function switchAppModeHandler (evt) {
     });
     evt.target.classList.add('switch-mode-btn--active');
   }
+}
+
+async function appLoadHandler () {
+  await windowLoadHandler(cardContainer);
+  controlBtnsContainer.querySelector('.switch-mode-btn--guess').classList.remove('switch-mode-btn--active');
 }
