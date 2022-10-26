@@ -196,6 +196,10 @@ body {
   }
 }
 
+.card--scoreboard {
+  padding: 1em 2em;
+}
+
 .slide-left {
   animation: slideLeftToRight 1s;
   animation-fill-mode: forwards;

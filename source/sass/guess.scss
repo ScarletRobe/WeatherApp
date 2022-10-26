@@ -157,3 +157,103 @@
     }
   }
 }
+
+// Scoreboard
+
+.scoreboard__header {
+  font-size: 50px;
+  text-align: center;
+
+  &::after {
+    content: "";
+    margin-top: .5em;
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid white;
+  }
+}
+
+.scoreboard__description {
+  font-size: 30px;
+  text-align: center;
+
+  margin-top: .5em;
+}
+
+.scoreboard__list-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  &::after {
+    content: "";
+    margin-top: .5em;
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid white;
+  }
+}
+
+.scoreboard__list {
+  margin-top: 0.5em;
+  list-style-position: inside;
+}
+
+.scoreboard__item {
+  font-size: 20px;
+}
+
+.scoreboard__registration {
+  margin-top: 0.5em;
+}
+
+.scoreboard__registration-header {
+  font-size: 30px;
+  text-align: center;
+}
+
+.scoreboard__form {
+  display: flex;
+  margin-top: 1em;
+}
+
+.scoreboard__search-bar {
+  font-size: 30px;
+  gap: .5em
+}
+
+.scoreboard__form-submit-btn {
+  box-sizing: border-box;
+  background-color: inherit;
+  border: none;
+  border-radius: 25px;
+
+  path {
+    transition: fill .25s;
+  }
+
+  &:hover {
+    path {
+      fill:rgba(0, 0, 0, 0.6)
+    }
+  }
+  &:active {
+    path {
+      fill:rgba(0, 0, 0, 0.5)
+    }
+  }
+}
+
+.scoreboard__try-again-btn {
+  width: 200px;
+  height: 50px;
+
+  margin: 2em auto 0;
+  text-align: center;
+  vertical-align: middle;
+
+  font-size: 15px;
+  border-radius: 30px;
+  border: none;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+}
