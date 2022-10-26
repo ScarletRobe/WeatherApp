@@ -13,7 +13,7 @@ import { GuessMode, GuessComponents, ContainerMode } from './const.js';
 const geonames = new Geonames();
 const weather = new Weather();
 const unsplash = new Unsplash();
-const scoreboard = new Scoreboard();
+const fetchScoreboard = new Scoreboard();
 
 // Компоненты
 
@@ -24,8 +24,9 @@ let containerComponent = null;
 
 // Переменные
 
-const MAX_QUESTIONS_AMOUNT = 1;
+const MAX_QUESTIONS_AMOUNT = 5;
 let questionNum = null;
+let totalScore = null;
 let timeUpdateIntervalId;
 let weatherInfo;
 let cityInfo;
@@ -179,9 +180,15 @@ const showGuessTemperature = (images) => {
 
 const showGuessScoreboard = async () => {
   currentMode = GuessMode.SCOREBOARD;
+  const scoreboard = (await fetchScoreboard.getScoreboard()).scoreboard;
+  const place = scoreboard.find((item) => item.score < totalScore)?.place;
   renderGuessComponent({
     component: GuessComponents.SCOREBOARD,
-    data: 1,
+    data: {
+      scoreboard,
+      totalScore,
+      place,
+    }
   });
 };
 
@@ -206,16 +213,19 @@ const getDataForGuess = async () => {
 
 const initGuessComponent = async (container) => {
   questionNum = 1;
+  totalScore = 100;
   containerComponent = container;
   const images = await getDataForGuess();
   showGuessTemperature(images);
 };
 
 function guessFormSubmitHandler(inputValue) {
+  const diff = Number(inputValue) - Number(Math.round(weatherInfo.main.temp));
+  totalScore -= Math.abs(diff);
   showGuessResult({
     real: Math.round(Number(weatherInfo.main.temp)),
     user: Number(inputValue),
-    diff: Number(inputValue) - Number(Math.round(weatherInfo.main.temp)),
+    diff,
   });
 }
 
