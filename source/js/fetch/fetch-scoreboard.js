@@ -8,9 +8,17 @@ export default class Scoreboard {
     return await this.fetchScoreboard();
   }
 
-  async fetchScoreboard() {
+  async patchScoreboard(user) {
+    return await this.fetchScoreboard('PATCH', user);
+  }
+
+  async fetchScoreboard(method, user) {
     try {
-      const response = await fetch(`${this.BASE_URL}api/scoreboard`);
+      const response = await fetch(`${this.BASE_URL}api/scoreboard`, {
+        method,
+        headers: new Headers({'Content-Type': 'application/json'}),
+        body: JSON.stringify(user),
+      });
       if(!response.ok) {
         throw new Error(response.statusText);
       }
