@@ -128,6 +128,7 @@ const removeGuessComponent = async (isModeChange = false, componentName) => {
         }
         break;
       case GuessComponents.RESULT:
+        guessResultComponent.manageBtnVisibility(false);
         if (guessResultComponent) {
           containerComponent.slideLeft(() => {
             removeComponent(guessResultComponent);
@@ -216,7 +217,12 @@ const initGuessComponent = async (container) => {
   questionNum = 1;
   totalScore = 100;
   containerComponent = container;
-  const images = await getDataForGuess();
+  let images = await getDataForGuess();
+
+  while (!weatherInfo) {
+    images = await getDataForGuess();
+  }
+
   showGuessTemperature(images);
 };
 
