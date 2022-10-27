@@ -17,7 +17,7 @@ const getGuessTemperatureTemplate = (cityInfo, questionNum, questionsAmount) => 
       </div>
     </div>
     <form class="guess__input">
-      <input class="guess__search-bar" type="text" placeholder="Enter your answer"><span class="guess__search-bar-celsium">°C</span>
+      <input class="guess__search-bar" type="text" placeholder="Enter your answer" title="Число от -90 до 60" required><span class="guess__search-bar-celsium">°C</span>
     </form>
   </div>`
 );
@@ -62,9 +62,23 @@ export default class GuessTemperatureView extends AbstractView {
     }, VANISH_ANIMATION_TIME);
   }
 
+  validateInput() {
+    const value = this.element.querySelector('.guess__search-bar').value;
+    const isValid = !isNaN(value) && value <= 60 && value >= -90;
+    if (isValid) {
+      this.element.querySelector('.guess__search-bar').style.borderBottom = '1px solid green';
+    } else {
+      this.element.querySelector('.guess__search-bar').style.borderBottom = '1px solid red';
+    }
+    return isValid;
+  }
+
   setSubmitHandler(cb) {
     this.element.querySelector('.guess__input').addEventListener('submit', (evt) => {
       evt.preventDefault();
+      if (!this.validateInput()) {
+        return;
+      }
       cb(this.element.querySelector('.guess__search-bar').value);
       this.element.querySelector('.guess__search-bar').value = '';
     });
