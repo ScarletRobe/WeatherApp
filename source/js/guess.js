@@ -1,7 +1,7 @@
-import Geonames from './fetch/fetch-geonames.js';
 import Weather from './fetch/fetch-weather.js';
 import Unsplash from './fetch/fetch-unsplash.js';
 import Scoreboard from './fetch/fetch-scoreboard.js';
+import FetchCountriesDataBase from './fetch/fetch-countries-database.js';
 
 import GuessTemperatureView from './view/guess/guess-temperature-view.js';
 import GuessResultView from './view/guess/guess-result-view.js';
@@ -10,10 +10,10 @@ import ScoreboardView from './view/guess/scoreboard-view.js';
 import { calculateLocalTime } from './utils.js';
 import { GuessMode, GuessComponents, ContainerMode } from './const.js';
 
-const geonames = new Geonames();
 const weather = new Weather();
 const unsplash = new Unsplash();
 const fetchScoreboard = new Scoreboard();
+const fetchCountries = new FetchCountriesDataBase();
 
 // Компоненты
 
@@ -196,7 +196,15 @@ const showGuessScoreboard = async () => {
 
 const getDataForGuess = async () => {
   try {
-    cityInfo = (await geonames.getCityInfo()).geonames[0];
+    const randomCity = (await fetchCountries.getCityInfo()).results[0];
+    cityInfo = {
+      name: randomCity.name,
+      countryId: randomCity.country.objectId,
+    };
+    const countryInfo = await fetchCountries.getCountryInfo(cityInfo.countryId);
+    cityInfo.countryName = countryInfo.name;
+    cityInfo.countryEmoji = countryInfo.emoji;
+
     const [data, images] = await Promise.allSettled([
       weather.searchByCity(cityInfo.name),
       unsplash.getImage(cityInfo.name, cityInfo.countryName),
@@ -219,7 +227,10 @@ const initGuessComponent = async (container) => {
   containerComponent = container;
   let images = await getDataForGuess();
 
-  while (!weatherInfo) {
+  for (let i = 0; i <= 5; i++) {
+    if (weatherInfo) {
+      return;
+    }
     images = await getDataForGuess();
   }
 
