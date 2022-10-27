@@ -7,7 +7,7 @@ const getGuessTemperatureTemplate = (cityInfo, questionNum, questionsAmount) => 
    <h2 class="guess__question-number">${questionNum} / ${questionsAmount}</h2>
     <div class="guess__known-info">
       <div class="guess__about">
-        <h1 class="guess__country">${cityInfo.countryName},</h1>
+        <h1 class="guess__country">${cityInfo.countryEmoji} ${cityInfo.countryName},</h1>
         <br>
         <h1 class="guess__city">${cityInfo.name}</h1>
       </div>
