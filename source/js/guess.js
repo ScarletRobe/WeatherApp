@@ -229,7 +229,7 @@ const initGuessComponent = async (container) => {
 
   for (let i = 0; i <= 5; i++) {
     if (weatherInfo) {
-      return;
+      break;
     }
     images = await getDataForGuess();
   }
