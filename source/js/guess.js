@@ -102,6 +102,7 @@ const removeGuessComponent = async (isModeChange = false, componentName) => {
         break;
     }
   }
+  clearInterval(timeUpdateIntervalId);
 
   const prom = new Promise((resolve) => {
     const removeComponent = (component) => {
@@ -197,11 +198,21 @@ const showGuessScoreboard = async () => {
 const getDataForGuess = async () => {
   try {
     const randomCity = (await fetchCountries.getCityInfo()).results[0];
+
+    if(!randomCity) {
+      throw new Error('Can\'t get random city');
+    }
+
     cityInfo = {
       name: randomCity.name,
       countryId: randomCity.country.objectId,
     };
     const countryInfo = await fetchCountries.getCountryInfo(cityInfo.countryId);
+
+    if(!countryInfo) {
+      throw new Error('Can\'t get country info');
+    }
+
     cityInfo.countryName = countryInfo.name;
     cityInfo.countryEmoji = countryInfo.emoji;
 
@@ -255,10 +266,17 @@ async function guessNextBtnHandler() {
     showGuessScoreboard();
     return;
   }
-  const [, images] = await Promise.all([
+  let [, images] = await Promise.all([
     removeGuessComponent(false, GuessComponents.RESULT),
     getDataForGuess()
   ]);
+
+  for (let i = 0; i <= 5; i++) {
+    if (weatherInfo) {
+      break;
+    }
+    images = await getDataForGuess();
+  }
 
   showGuessTemperature(images);
 }
