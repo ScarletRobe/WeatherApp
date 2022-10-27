@@ -1,7 +1,7 @@
 export default class Scoreboard {
   constructor() {
     this.API_KEY = '';
-    this.BASE_URL = 'http://leonid.alwaysdata.net/';
+    this.BASE_URL = 'https://leonid.alwaysdata.net/';
   }
 
   async getScoreboard() {
