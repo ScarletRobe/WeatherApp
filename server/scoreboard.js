@@ -26,7 +26,12 @@ app.patch('/api/scoreboard', (req, res) => {
 
   const json1 = readFileSync(scoreboardPath, 'utf8');
   const object = JSON.parse(json1);
-  object.scoreboard.splice(newUser.place - 1, 1, newUser);
+
+  object.scoreboard.splice(newUser.place - 1, 0, newUser);
+  object.scoreboard.pop();
+  for(let i = newUser.place; i < object.scoreboard.length; i++) {
+    object.scoreboard[i].place++;
+  }
 
   const json2 = JSON.stringify(object);
   writeFileSync(scoreboardPath, json2);
