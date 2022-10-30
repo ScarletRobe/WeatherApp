@@ -17,7 +17,7 @@ const getGuessTemperatureTemplate = (cityInfo, questionNum, questionsAmount) => 
       </div>
     </div>
     <form class="guess__input">
-      <input class="guess__search-bar" type="text" placeholder="Enter your answer" title="Число от -90 до 60" required><span class="guess__search-bar-celsium">°C</span>
+      <input class="guess__search-bar text-bar" type="text" placeholder="Enter your answer" title="Число от -90 до 60" required><span class="guess__search-bar-celsium">°C</span>
     </form>
   </div>`
 );

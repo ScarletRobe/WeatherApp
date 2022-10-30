@@ -8,7 +8,7 @@
 body {
   height: 100vh;
   font-size: 20px;
-  // padding: 1em;
+  padding: 0 5px 5px;
 
   overflow: hidden;
   background-color: rgb(255, 255, 255);
@@ -40,6 +40,7 @@ body {
   justify-content: center;
   align-items: center;
 
+  font-size: 25px;
   border-right: 1px solid white;
   color: rgba(255, 255, 255, 0.800);
   background-color: rgba(0, 0, 0, 0.747);
@@ -71,6 +72,7 @@ body {
 }
 
 .card {
+  box-sizing: border-box;
   max-width: 500px;
   width: 100%;
 
@@ -86,6 +88,11 @@ body {
 
   color: white;
   background-color: rgba(0, 0, 0, 0.747);
+
+  @media screen and (max-width: 600px) {
+  overflow-y: scroll;
+  // max-width: 310px;
+  }
 }
 
 .card__search {
@@ -94,6 +101,13 @@ body {
   gap: 1em;
 
   margin-bottom: 2em;
+}
+
+.text-bar {
+  overflow: hidden;
+  @media screen and (max-width: 600px) {
+    font-size: 20px;
+  }
 }
 
 .card__search-bar {
@@ -159,16 +173,18 @@ body {
   font-size: 40px;
 }
 
-.card__temperature {
+.card__main {
   margin-bottom: .5em;
 
+}
+
+.card__temperature {
   font-size: 40px;
 }
 
 .card__icon {
   width: 60px;
   font-size: 40px;
-  margin-bottom: .5em;
 }
 
 .card__description {
