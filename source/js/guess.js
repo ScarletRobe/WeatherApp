@@ -144,6 +144,7 @@ const removeGuessComponent = async (isModeChange = false, componentName) => {
           containerComponent.slideLeft(() => {
             removeComponent(guessScoreboardComponent);
             guessScoreboardComponent = null;
+            containerComponent.switchMode(ContainerMode.NORMAL);
             resolve();
           });
         }
