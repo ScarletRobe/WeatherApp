@@ -78,7 +78,7 @@ body {
 
 .card {
   box-sizing: border-box;
-  max-width: 500px;
+  max-width: 550px;
   width: 100%;
 
   position: relative;
@@ -199,6 +199,18 @@ body {
 .card__more-info {
   display: flex;
   justify-content: space-between;
+}
+
+.card__details {
+  div {
+    border-bottom: 1px solid white;
+  }
+}
+
+.card__other-info {
+  div {
+    border-bottom: 1px solid white;
+  }
 }
 
 @media screen and (max-width: 600px){
