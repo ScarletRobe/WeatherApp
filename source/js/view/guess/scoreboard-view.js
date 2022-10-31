@@ -9,7 +9,6 @@ const getScoreboardDescriptionTemplate = (place) => place ? `<h2 class="scoreboa
 const getScoreboardFormtemplate = (place) => (
   place ?
     `<div class="scoreboard__registration">
-    <h2 class="scoreboard__registration-header">Enter your name to update scoreboard</h2>
       <form action="" class="scoreboard__form">
         <input class="text-bar guess__search-bar scoreboard__search-bar" type="text" placeholder="Enter your name here" maxlength="45" required>
         <button class="scoreboard__form-submit-btn" type="submit">

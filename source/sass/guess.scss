@@ -10,6 +10,10 @@
   }
 }
 
+.guess__question-number {
+  font-weight: 700;
+}
+
 .guess__header {
   color: white;
   text-shadow: 1px 1px 0 black;
@@ -45,17 +49,16 @@
 }
 
 .guess__about {
-  width: fit-content;
+  width: 100%;
 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   position: relative;
   margin: 0 auto;
-  text-align: center;
-}
 
-.guess__country {
-  display: block;
-  text-align: start;
   font-size: 50px;
+  text-align: center;
 
   &::after {
     width: 60px;
@@ -70,6 +73,21 @@
 
     position: absolute;
     top: -10px;
+    right: 0;
+  }
+
+  @media screen and (max-width: 600px) {
+    font-size: 30px;
+  }
+}
+
+.guess__country {
+  display: block;
+  text-align: start;
+  font-size: 50px;
+
+  @media screen and (max-width: 600px) {
+    font-size: 30px;
   }
 }
 
@@ -77,6 +95,10 @@
   display: block;
   text-align: start;
   font-size: 50px;
+
+  @media screen and (max-width: 600px) {
+    font-size: 30px;
+  }
 }
 
 .guess__icon {
@@ -146,6 +168,10 @@
 
   display: flex;
   justify-content: space-around;
+
+  @media screen and (max-width: 600px) {
+    font-size: 18px;
+  }
 }
 
 .guess__result {
@@ -189,15 +215,23 @@
   }
 
   @media screen and (max-width: 800px) {
+    width: 50px;
+    height: 50px;
+
     position: static;
     margin-top: 2em;
+
+    svg {
+      width: 30px;
+      height: 30px;
+    }
   }
 }
 
 // Scoreboard
 
 .scoreboard__header {
-  font-size: 50px;
+  font-size: 35px;
   text-align: center;
 
   &::after {

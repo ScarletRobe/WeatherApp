@@ -28,7 +28,7 @@ export default class Unsplash {
     }
 
     const pageAmount = data.total_pages;
-    return this.fetchUnsplash(keyword, getRandomPositiveInteger(0, pageAmount >= 30 ? 30 : pageAmount));
+    return this.fetchUnsplash(keyword, getRandomPositiveInteger(0, pageAmount >= 100 ? 100 : pageAmount));
   }
 
   async fetchUnsplash(keyword, page) {
