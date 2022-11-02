@@ -179,7 +179,7 @@ const showGuessTemperature = (images) => {
   renderGuessComponent({
     component: GuessComponents.TEMPERATURE,
   });
-  updateBackground(images.value, cityInfo.name);
+  updateBackground(images?.value, cityInfo.name);
 };
 
 const showGuessScoreboard = async () => {
