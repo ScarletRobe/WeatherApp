@@ -30,11 +30,11 @@ async function switchAppModeHandler (evt) {
     switch (evt.target.control.id) {
       case ('btn--guess'):
         await removeWeatherComponent();
-        initGuessComponent(cardContainer);
+        await initGuessComponent(cardContainer);
         break;
       case ('btn--weather'):
         await removeGuessComponent(true);
-        windowLoadHandler(cardContainer);
+        await windowLoadHandler(cardContainer);
         break;
     }
 

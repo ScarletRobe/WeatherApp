@@ -113,7 +113,7 @@ async function makeRequestsByCity (searchquery = 'Moscow', translatedSearchQuery
     }
     await removeWeatherComponent();
     renderWeatherComponent(data.value);
-    updateBackground(images.value, translatedSearchQuery);
+    updateBackground(images?.value, translatedSearchQuery);
 
   } catch (error) {
     console.log(error);
