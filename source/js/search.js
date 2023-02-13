@@ -76,7 +76,7 @@ const removeWeatherComponent = async () => {
 
 const updateBackground = (images, searchQuery) => {
   if (images) {
-    document.body.style.background = `url(${images.results[0].urls.full})`;
+    document.body.style.background = `url(${images.results[0].urls.regular})`;
   } else {
     document.body.style.background = `url(https://source.unsplash.com/1600x900/?${searchQuery})`;
   }
